@@ -1,6 +1,4 @@
 ---
 layout: home
-list_title: 新内容
+title: 首页
 ---
-
-随便写点。

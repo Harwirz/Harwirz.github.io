@@ -1,0 +1,11 @@
+---
+layout: default
+---
+<main id="main-content" class="reading-page full-archive">
+  <a class="back-link" href="{{ '/' | relative_url }}">← 返回文章索引</a>
+  <header class="page-heading"><h1>文章归档</h1></header>
+  <nav class="archive-jump" aria-label="归档目录"><a href="#all-posts">时间</a><a href="#by-category">类别</a><a href="#by-tag">标签</a></nav>
+  <section id="all-posts" class="archive-section"><h2>按时间</h2>{% assign years = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" %}{% for year in years %}<div id="year-{{ year.name }}" class="archive-subgroup"><h3>{{ year.name }} <small>{{ year.items.size }} 篇</small></h3>{% assign entries = year.items %}{% include archive-entries.html %}</div>{% endfor %}{% if site.posts.size == 0 %}<p class="archive-empty">暂无文章。</p>{% endif %}</section>
+  <section id="by-category" class="archive-section"><h2>按类别</h2>{% for category in site.category_order %}<div id="category-{{ category | slugify: 'pretty' }}" class="archive-subgroup"><h3>{{ category | escape }} <small>{{ site.categories[category].size | default: 0 }} 篇</small></h3>{% assign entries = site.categories[category] %}{% include archive-entries.html %}</div>{% endfor %}{% for category in site.categories %}{% unless site.category_order contains category[0] %}<div id="category-{{ category[0] | slugify: 'pretty' }}" class="archive-subgroup"><h3>{{ category[0] | escape }} <small>{{ category[1].size }} 篇</small></h3>{% assign entries = category[1] %}{% include archive-entries.html %}</div>{% endunless %}{% endfor %}</section>
+  <section id="by-tag" class="archive-section"><h2>按标签</h2>{% for tag in site.tags %}<div id="tag-{{ tag[0] | slugify: 'pretty' }}" class="archive-subgroup"><h3>#{{ tag[0] | escape }} <small>{{ tag[1].size }} 篇</small></h3>{% assign entries = tag[1] %}{% include archive-entries.html %}</div>{% endfor %}{% if site.tags.size == 0 %}<p class="archive-empty">暂无标签。</p>{% endif %}</section>
+</main>

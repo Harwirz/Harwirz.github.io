@@ -1,0 +1,1 @@
+{% if entries.size > 0 %}<ul class="archive-entries">{% for entry in entries %}<li><time datetime="{{ entry.date | date_to_xmlschema }}">{{ entry.date | date: '%m.%d' }}</time><a href="{{ entry.url | relative_url }}">{{ entry.title | escape }}</a></li>{% endfor %}</ul>{% else %}<p class="archive-empty">暂无文章。</p>{% endif %}

@@ -2,10 +2,13 @@
 layout: post
 title: "我的第一篇博客"
 date: 2026-11-17 00:00:00 +0800
-categories: [学习笔记]
+categories: [笔记]
+permalink: /学习笔记/2026/11/17/hello-world.html
+tags: [建站, 学习记录]
 ---
 
 今天开始搭建自己的博客，记录学习与思考。
+<!--more-->
 
 ## 为什么开始写博客
 

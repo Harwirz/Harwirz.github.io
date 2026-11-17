@@ -1,20 +1,32 @@
 title: "搞搞新意思"
-description: "记录学习、阅读与思考"
+description: "记录学习、阅读与思考。一个慢慢生长的个人网站。"
 author: Harwirz
-
 url: "https://harwirz.github.io"
 baseurl: ""
 lang: zh-CN
+timezone: Asia/Shanghai
 
 theme: minima
 show_excerpts: true
+excerpt_separator: "<!--more-->"
 
-header_pages:
-  - about.md
+profile:
+  avatar: /assets/images/avatar.jpg
+  greeting: "你好，欢迎来坐坐。"
+  github: https://github.com/Harwirz
 
-minima:
-  date_format: "%Y-%m-%d"
+category_order:
+  - 杂文
+  - 笔记
+  - 分享
 
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - DESIGN_NOTES.md
+  - test.rb

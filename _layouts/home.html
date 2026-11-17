@@ -1,0 +1,43 @@
+---
+layout: default
+---
+<main id="main-content" class="article-index" data-archive>
+  <div class="list-heading" role="status" aria-live="polite" aria-atomic="true">
+    <h1>全部文章</h1><span class="sr-only" data-filter-summary>全部文章</span><span class="result-total"><span data-result-count>{{ site.posts.size }}</span> 篇</span>
+  </div>
+  <nav class="index-toolbar" aria-label="文章索引">
+    <div class="index-group" aria-label="类别">
+      <span class="index-label">类别</span>
+      <a class="index-link is-active" data-filter-kind="category" data-filter-value="" href="{{ '/archive/#all-posts' | relative_url }}" aria-current="true">全部</a>
+      {% assign ordered_categories = site.category_order %}
+      {% for category in ordered_categories %}
+      <a class="index-link" data-filter-kind="category" data-filter-value="{{ category | escape }}" href="{{ '/archive/' | relative_url }}#category-{{ category | slugify: 'pretty' }}">{{ category | escape }}</a>
+      {% endfor %}
+      {% for category in site.categories %}{% unless ordered_categories contains category[0] %}
+      <a class="index-link" data-filter-kind="category" data-filter-value="{{ category[0] | escape }}" href="{{ '/archive/' | relative_url }}#category-{{ category[0] | slugify: 'pretty' }}">{{ category[0] | escape }}</a>
+      {% endunless %}{% endfor %}
+    </div>
+    <div class="index-group" aria-label="时间">
+      <span class="index-label">时间</span>
+      <a class="index-link is-active" data-filter-kind="year" data-filter-value="" href="{{ '/archive/#all-posts' | relative_url }}" aria-current="true">全部</a>
+      {% assign years = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" %}{% for year in years %}
+      <a class="index-link" data-filter-kind="year" data-filter-value="{{ year.name }}" href="{{ '/archive/#year-' | append: year.name | relative_url }}">{{ year.name }}年</a>
+      {% endfor %}
+    </div>
+    {% if site.tags.size > 0 %}<div class="index-group" aria-label="标签">
+      <span class="index-label">标签</span>
+      <a class="index-link is-active" data-filter-kind="tag" data-filter-value="" href="{{ '/archive/#by-tag' | relative_url }}" aria-current="true">全部</a>
+      {% for tag in site.tags %}<a class="index-link" data-filter-kind="tag" data-filter-value="{{ tag[0] | escape }}" href="{{ '/archive/' | relative_url }}#tag-{{ tag[0] | slugify: 'pretty' }}">{{ tag[0] | escape }}</a>{% endfor %}
+    </div>{% endif %}
+    <div class="sort-controls" data-script-controls hidden>
+      <button class="clear-filters" data-clear-filters hidden type="button">清除筛选</button>
+      <label for="post-sort" class="sr-only">文章排序</label><select id="post-sort" data-sort><option value="newest">最新在前</option><option value="oldest">最早在前</option></select>
+    </div>
+  </nav>
+  <div class="post-list" data-post-list>
+    {% for post in site.posts %}{% include post-card.html %}{% endfor %}
+  </div>
+  <div class="empty-state" data-no-results hidden><p>暂无符合条件的文章。</p><button type="button" class="text-button" data-clear-filters>查看全部文章</button></div>
+  {% if site.posts.size == 0 %}<p class="empty-state">暂无文章。</p>{% endif %}
+  <noscript><p class="noscript-note">索引可直接跳转到<a href="{{ '/archive/' | relative_url }}">文章归档</a>。</p></noscript>
+</main>

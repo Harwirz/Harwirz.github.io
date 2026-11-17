@@ -1,0 +1,135 @@
+{%- comment -%}
+  Native Liquid only. Prefer front matter; otherwise use the first rendered img.
+  Parse exact attribute names so data-src and srcset cannot become the source.
+{%- endcomment -%}
+{%- assign thumb_src = '' -%}
+{%- assign thumb_alt = '' -%}
+{%- if post.thumbnail != false -%}
+  {%- if post.thumbnail and post.thumbnail != empty -%}
+    {%- assign thumb_src = post.thumbnail | strip -%}
+    {%- assign thumb_alt = post.thumbnail_alt | default: '' -%}
+  {%- else -%}
+    {%- assign thumb_html = post.content | markdownify | normalize_whitespace -%}
+    {%- assign thumb_fragments = thumb_html | split: '<' -%}
+    {%- assign thumb_in_comment = false -%}
+    {%- assign thumb_raw_tag = '' -%}
+    {%- for thumb_fragment in thumb_fragments -%}
+      {%- if forloop.first -%}{%- continue -%}{%- endif -%}
+      {%- assign thumb_lower = thumb_fragment | downcase -%}
+      {%- assign thumb_start = thumb_lower | slice: 0, 3 -%}
+      {%- if thumb_in_comment -%}
+        {%- if thumb_fragment contains '-->' -%}{%- assign thumb_in_comment = false -%}{%- endif -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- if thumb_start == '!--' -%}
+        {%- unless thumb_fragment contains '-->' -%}{%- assign thumb_in_comment = true -%}{%- endunless -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- assign thumb_tag_name = thumb_lower | split: ' ' | first | split: '>' | first -%}
+      {%- if thumb_raw_tag != empty -%}
+        {%- assign thumb_raw_close = thumb_raw_tag | prepend: '/' -%}
+        {%- if thumb_tag_name == thumb_raw_close -%}{%- assign thumb_raw_tag = '' -%}{%- endif -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- if thumb_tag_name == 'script' or thumb_tag_name == 'style' or thumb_tag_name == 'textarea' or thumb_tag_name == 'title' -%}
+        {%- assign thumb_raw_tag = thumb_tag_name -%}
+        {%- continue -%}
+      {%- endif -%}
+      {%- assign thumb_boundary = thumb_lower | slice: 3, 1 -%}
+      {%- unless thumb_start == 'img' and thumb_boundary == ' ' -%}{%- continue -%}{%- endunless -%}
+      {%- assign thumb_attributes = thumb_fragment | slice: 3, thumb_fragment.size | split: '' -%}
+      {%- assign thumb_state = 'before_name' -%}
+      {%- assign thumb_name = '' -%}
+      {%- assign thumb_value = '' -%}
+      {%- assign thumb_quote = '' -%}
+      {%- assign thumb_tag_src = '' -%}
+      {%- assign thumb_tag_alt = '' -%}
+      {%- assign thumb_alt_found = false -%}
+      {%- for thumb_char in thumb_attributes -%}
+        {%- assign thumb_commit = false -%}
+        {%- assign thumb_done = false -%}
+        {%- assign thumb_current_state = thumb_state -%}
+        {%- case thumb_current_state -%}
+          {%- when 'before_name' -%}
+            {%- if thumb_char == '>' -%}{%- assign thumb_done = true -%}
+            {%- elsif thumb_char != ' ' and thumb_char != '/' -%}
+              {%- assign thumb_name = thumb_char | downcase -%}{%- assign thumb_state = 'name' -%}
+            {%- endif -%}
+          {%- when 'name' -%}
+            {%- if thumb_char == '=' -%}{%- assign thumb_state = 'before_value' -%}
+            {%- elsif thumb_char == ' ' -%}{%- assign thumb_state = 'after_name' -%}
+            {%- elsif thumb_char == '>' -%}{%- assign thumb_done = true -%}
+            {%- else -%}{%- assign thumb_name = thumb_name | append: thumb_char | downcase -%}
+            {%- endif -%}
+          {%- when 'after_name' -%}
+            {%- if thumb_char == '=' -%}{%- assign thumb_state = 'before_value' -%}
+            {%- elsif thumb_char == '>' -%}{%- assign thumb_done = true -%}
+            {%- elsif thumb_char != ' ' and thumb_char != '/' -%}
+              {%- assign thumb_name = thumb_char | downcase -%}{%- assign thumb_state = 'name' -%}
+            {%- endif -%}
+          {%- when 'before_value' -%}
+            {%- if thumb_char == '"' or thumb_char == "'" -%}
+              {%- assign thumb_quote = thumb_char -%}{%- assign thumb_value = '' -%}{%- assign thumb_state = 'quoted_value' -%}
+            {%- elsif thumb_char == '>' -%}{%- assign thumb_done = true -%}
+            {%- elsif thumb_char != ' ' -%}
+              {%- assign thumb_value = thumb_char -%}{%- assign thumb_state = 'unquoted_value' -%}
+            {%- endif -%}
+          {%- when 'quoted_value' -%}
+            {%- if thumb_char == thumb_quote -%}
+              {%- assign thumb_commit = true -%}{%- assign thumb_state = 'before_name' -%}
+            {%- else -%}{%- assign thumb_value = thumb_value | append: thumb_char -%}
+            {%- endif -%}
+          {%- when 'unquoted_value' -%}
+            {%- if thumb_char == ' ' or thumb_char == '>' -%}
+              {%- assign thumb_commit = true -%}{%- assign thumb_state = 'before_name' -%}
+              {%- if thumb_char == '>' -%}{%- assign thumb_done = true -%}{%- endif -%}
+            {%- else -%}{%- assign thumb_value = thumb_value | append: thumb_char -%}
+            {%- endif -%}
+        {%- endcase -%}
+        {%- if thumb_commit -%}
+          {%- if thumb_name == 'src' and thumb_tag_src == empty -%}{%- assign thumb_tag_src = thumb_value | strip -%}
+          {%- elsif thumb_name == 'alt' and thumb_alt_found == false -%}
+            {%- assign thumb_tag_alt = thumb_value -%}{%- assign thumb_alt_found = true -%}
+          {%- endif -%}
+        {%- endif -%}
+        {%- if thumb_done -%}{%- break -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if thumb_tag_src != empty -%}
+        {%- assign thumb_src = thumb_tag_src -%}
+        {%- assign thumb_alt = thumb_tag_alt -%}
+        {%- if post.thumbnail_alt -%}{%- assign thumb_alt = post.thumbnail_alt -%}{%- endif -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if thumb_src != empty -%}
+  {%- assign thumb_src = thumb_src | replace: '&amp;', '&' | replace: '&#38;', '&' | replace: '&#x26;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" | replace: '&apos;', "'" | replace: '&lt;', '<' | replace: '&gt;', '>' -%}
+  {%- assign thumb_prefix = thumb_src | downcase -%}
+  {%- assign thumb_http = thumb_prefix | slice: 0, 7 -%}
+  {%- assign thumb_https = thumb_prefix | slice: 0, 8 -%}
+  {%- assign thumb_protocol_relative = thumb_prefix | slice: 0, 2 -%}
+  {%- assign thumb_data_image = thumb_prefix | slice: 0, 11 -%}
+  {%- assign thumb_root = thumb_src | slice: 0, 1 -%}
+  {%- if thumb_http == 'http://' or thumb_https == 'https://' or thumb_protocol_relative == '//' or thumb_data_image == 'data:image/' -%}
+    {%- assign thumb_url = thumb_src -%}
+  {%- elsif thumb_root == '/' -%}
+    {%- assign thumb_baseurl = site.baseurl | default: '' -%}
+    {%- assign thumb_baseurl_prefix = thumb_baseurl | append: '/' -%}
+    {%- assign thumb_src_prefix = thumb_src | slice: 0, thumb_baseurl_prefix.size -%}
+    {%- if thumb_baseurl != empty and thumb_src_prefix == thumb_baseurl_prefix -%}
+      {%- assign thumb_url = thumb_src -%}
+    {%- else -%}
+      {%- assign thumb_url = thumb_src | relative_url -%}
+    {%- endif -%}
+  {%- else -%}
+    {%- assign thumb_post_end = post.url | slice: -1, 1 -%}
+    {%- if thumb_post_end == '/' -%}
+      {%- assign thumb_base = post.url -%}
+    {%- else -%}
+      {%- assign thumb_base = post.url | split: '/' | pop | join: '/' | append: '/' -%}
+    {%- endif -%}
+    {%- assign thumb_url = thumb_base | append: thumb_src | relative_url -%}
+  {%- endif -%}
+<a class="post-thumbnail" aria-label="阅读：{{ post.title | escape }}" href="{{ post.url | relative_url }}"><img src="{{ thumb_url | escape_once }}" alt="{{ thumb_alt | escape_once }}" loading="lazy" decoding="async"></a>
+{%- endif -%}
