@@ -1,0 +1,20 @@
+title: "Harwirz 的博客"
+description: "记录学习、阅读与思考"
+author: Harwirz
+
+url: "https://harwirz.github.io"
+baseurl: ""
+lang: zh-CN
+
+theme: minima
+show_excerpts: true
+
+header_pages:
+  - about.md
+
+minima:
+  date_format: "%Y-%m-%d"
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
