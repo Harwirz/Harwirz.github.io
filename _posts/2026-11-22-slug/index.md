@@ -20,4 +20,4 @@ thumbnail: cover.png
 &nbsp;
 &nbsp;
 
-再发点美图凑数 ![a](pic1.png "没事，对美少女的欣赏，ai还没有攻破！")
+再发点美图凑数 ![a](pic1.png "大丈夫，美少女って何て，aiはまだ突破しない！")
