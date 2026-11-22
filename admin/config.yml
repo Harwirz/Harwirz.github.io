@@ -19,7 +19,7 @@ collections:
     extension: "md"
     format: "yaml-frontmatter"
     slug: "{{year}}-{{month}}-{{day}}-{{hour}}{{minute}}{{second}}"
-    summary: "{{year}}-{{month}}-{{day}} · {{title}}"
+    summary: "{{date | date('YYYY-MM-DD')}} · {{title}}"
     fields:
       - label: "布局"
         name: "layout"
