@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>内容管理 · 搞搞新意思</title>
+  <link href="./config.yml" type="application/yaml" rel="cms-config-url" />
+</head>
+<body>
+  <script>
+    window.CMS_MANUAL_INIT = true;
+  </script>
+  <!-- Self-hosted @sveltia/cms v0.270.1 -->
+  <script src="./sveltia-cms.js"></script>
+  <script>
+    window.CMS.registerEditorComponent({
+      id: "excerpt_separator",
+      label: "摘要分隔线 (more)",
+      fields: [],
+      pattern: /^<!--\s*more\s*-->$/m,
+      fromBlock: () => ({}),
+      toBlock: () => "<!--more-->",
+      toPreview: () =>
+        '<div style="border-top:2px dashed #e48a9c;margin:16px 0;padding-top:4px;font-size:12px;color:#888;text-align:center;">以上为首页摘要，以下为正文（&lt;!--more--&gt;）</div>',
+    });
+    window.CMS.init();
+  </script>
+</body>
+</html>
