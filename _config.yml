@@ -31,3 +31,5 @@ exclude:
   - DESIGN_NOTES.md
   - test.rb
   - blog
+  - vendor/
+  - node_modules/
