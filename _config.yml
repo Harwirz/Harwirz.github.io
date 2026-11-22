@@ -30,3 +30,4 @@ exclude:
   - README.md
   - DESIGN_NOTES.md
   - test.rb
+  - blog
